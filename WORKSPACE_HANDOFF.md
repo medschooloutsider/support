@@ -7,6 +7,7 @@ Updated: 2026-04-29
 - Branch: `main`
 - Responsibility: public support site, private report intake, entitlement checks, moderation, and public grouped issue pages for GPT-MD, PDF-MD, and Alarmist.
 - Merge target: `main`
+- Master plan: `docs/coordination/MASTER_PLAN.md`
 
 ## Current Objective
 
