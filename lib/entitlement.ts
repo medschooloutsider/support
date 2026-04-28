@@ -46,26 +46,30 @@ export async function validateLemonLicenseKey(
     return false;
   }
 
-  const response = await fetch(
-    "https://api.lemonsqueezy.com/v1/licenses/validate",
-    {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/x-www-form-urlencoded",
+  try {
+    const response = await fetch(
+      "https://api.lemonsqueezy.com/v1/licenses/validate",
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          license_key: trimmedLicenseKey,
+          instance_name: trimmedInstanceName,
+        }),
       },
-      body: new URLSearchParams({
-        license_key: trimmedLicenseKey,
-        instance_name: trimmedInstanceName,
-      }),
-    },
-  );
+    );
 
-  if (!response.ok) {
+    if (!response.ok) {
+      return false;
+    }
+
+    const data = await response.json();
+
+    return data.valid === true && data.license_key?.status === "active";
+  } catch {
     return false;
   }
-
-  const data = await response.json();
-
-  return data.valid === true && data.license_key?.status === "active";
 }

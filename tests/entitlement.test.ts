@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import {
+  parseLemonEntitlementRequestBody,
+  POST,
+} from "@/app/api/entitlements/lemon/route";
 import { decideEntitlement, validateLemonLicenseKey } from "@/lib/entitlement";
 
 const originalFetch = globalThis.fetch;
@@ -80,5 +84,71 @@ describe("validateLemonLicenseKey", () => {
 
     await expect(validateLemonLicenseKey("license-key", "owner@example.com"))
       .resolves.toBe(false);
+  });
+
+  it("returns false when Lemon validation fetch rejects", async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockRejectedValue(new Error("network unavailable"));
+    globalThis.fetch = fetchMock;
+
+    await expect(validateLemonLicenseKey("license-key", "owner@example.com"))
+      .resolves.toBe(false);
+  });
+
+  it("returns false when Lemon returns malformed JSON", async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(new Response("not-json", { status: 200 }));
+    globalThis.fetch = fetchMock;
+
+    await expect(validateLemonLicenseKey("license-key", "owner@example.com"))
+      .resolves.toBe(false);
+  });
+});
+
+describe("parseLemonEntitlementRequestBody", () => {
+  it("rejects non-object request bodies", () => {
+    expect(parseLemonEntitlementRequestBody(null)).toBeNull();
+    expect(parseLemonEntitlementRequestBody([])).toBeNull();
+    expect(parseLemonEntitlementRequestBody("invalid")).toBeNull();
+  });
+
+  it("extracts string license request fields", () => {
+    expect(
+      parseLemonEntitlementRequestBody({
+        licenseKey: "license-key",
+        reporterEmail: "owner@example.com",
+      }),
+    ).toEqual({
+      licenseKey: "license-key",
+      reporterEmail: "owner@example.com",
+    });
+  });
+});
+
+describe("POST /api/entitlements/lemon", () => {
+  it("returns 400 for malformed JSON", async () => {
+    const response = await POST(
+      new Request("https://example.com/api/entitlements/lemon", {
+        method: "POST",
+        body: "{",
+      }) as never,
+    );
+
+    await expect(response.json()).resolves.toEqual({ valid: false });
+    expect(response.status).toBe(400);
+  });
+
+  it("returns 400 for non-object JSON bodies", async () => {
+    const response = await POST(
+      new Request("https://example.com/api/entitlements/lemon", {
+        method: "POST",
+        body: JSON.stringify([]),
+      }) as never,
+    );
+
+    await expect(response.json()).resolves.toEqual({ valid: false });
+    expect(response.status).toBe(400);
   });
 });
