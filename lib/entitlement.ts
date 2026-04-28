@@ -20,6 +20,10 @@ export function decideEntitlement(
     return { allowed: true, kind: "app_origin", queue: "verified" };
   }
 
+  if (input.source === "app") {
+    return { allowed: false, kind: "unverified", queue: "unverified" };
+  }
+
   if (
     input.source === "web" &&
     input.lemonValid &&

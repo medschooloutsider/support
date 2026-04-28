@@ -9,17 +9,57 @@ describe("app origin signatures", () => {
   it("verifies a valid signature", async () => {
     const input = {
       body: JSON.stringify({ appId: "gpt_md", summary: "Export failed" }),
-      timestamp: "2026-04-29T00:00:00.000Z",
+      timestamp: "1777420800",
       secret: "test-secret",
     };
     const signature = await createAppOriginSignature(input);
 
     await expect(
-      verifyAppOriginSignature({ ...input, signature }),
+      verifyAppOriginSignature({
+        ...input,
+        signature,
+        nowSeconds: 1777420800,
+      }),
     ).resolves.toBe(true);
   });
 
   it("rejects a signature when the body is tampered", async () => {
+    const input = {
+      body: JSON.stringify({ appId: "gpt_md", summary: "Export failed" }),
+      timestamp: "1777420800",
+      secret: "test-secret",
+    };
+    const signature = await createAppOriginSignature(input);
+
+    await expect(
+      verifyAppOriginSignature({
+        ...input,
+        body: JSON.stringify({ appId: "gpt_md", summary: "Export passed" }),
+        signature,
+        nowSeconds: 1777420800,
+      }),
+    ).resolves.toBe(false);
+  });
+
+  it("rejects a stale timestamp", async () => {
+    const input = {
+      body: JSON.stringify({ appId: "gpt_md", summary: "Export failed" }),
+      timestamp: "1777420800",
+      secret: "test-secret",
+    };
+    const signature = await createAppOriginSignature(input);
+
+    await expect(
+      verifyAppOriginSignature({
+        ...input,
+        signature,
+        nowSeconds: 1777421101,
+        maxSkewSeconds: 300,
+      }),
+    ).resolves.toBe(false);
+  });
+
+  it("rejects a malformed timestamp", async () => {
     const input = {
       body: JSON.stringify({ appId: "gpt_md", summary: "Export failed" }),
       timestamp: "2026-04-29T00:00:00.000Z",
@@ -30,8 +70,8 @@ describe("app origin signatures", () => {
     await expect(
       verifyAppOriginSignature({
         ...input,
-        body: JSON.stringify({ appId: "gpt_md", summary: "Export passed" }),
         signature,
+        nowSeconds: 1777420800,
       }),
     ).resolves.toBe(false);
   });

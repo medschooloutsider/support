@@ -14,6 +14,17 @@ describe("decideEntitlement", () => {
     ).toEqual({ allowed: true, kind: "app_origin", queue: "verified" });
   });
 
+  it("rejects app-originated reports with an invalid app origin", () => {
+    expect(
+      decideEntitlement({
+        appId: "alarmist",
+        source: "app",
+        appOriginValid: false,
+        lemonValid: false,
+      }),
+    ).toEqual({ allowed: false, kind: "unverified", queue: "unverified" });
+  });
+
   it("verifies Lemon-verified web reports for GPT-MD", () => {
     expect(
       decideEntitlement({
