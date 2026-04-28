@@ -14,4 +14,3 @@ Public pages show reviewed grouped issues. Raw reports, reporter follow-up, enti
 
 - `npm run test`
 - `npm run build`
-- `npm run e2e`
