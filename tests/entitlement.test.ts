@@ -1,6 +1,13 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { decideEntitlement } from "@/lib/entitlement";
+import { decideEntitlement, validateLemonLicenseKey } from "@/lib/entitlement";
+
+const originalFetch = globalThis.fetch;
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  globalThis.fetch = originalFetch;
+});
 
 describe("decideEntitlement", () => {
   it("verifies app-originated reports with a valid app origin", () => {
@@ -45,5 +52,33 @@ describe("decideEntitlement", () => {
         lemonValid: false,
       }),
     ).toEqual({ allowed: true, kind: "unverified", queue: "unverified" });
+  });
+});
+
+describe("validateLemonLicenseKey", () => {
+  it("returns true for an active valid Lemon license", async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(
+        JSON.stringify({ valid: true, license_key: { status: "active" } }),
+        { status: 200 },
+      ),
+    );
+    globalThis.fetch = fetchMock;
+
+    await expect(validateLemonLicenseKey("license-key", "owner@example.com"))
+      .resolves.toBe(true);
+  });
+
+  it("returns false for an expired invalid Lemon license", async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(
+        JSON.stringify({ valid: false, license_key: { status: "expired" } }),
+        { status: 200 },
+      ),
+    );
+    globalThis.fetch = fetchMock;
+
+    await expect(validateLemonLicenseKey("license-key", "owner@example.com"))
+      .resolves.toBe(false);
   });
 });

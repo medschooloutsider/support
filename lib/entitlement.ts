@@ -34,3 +34,38 @@ export function decideEntitlement(
 
   return { allowed: true, kind: "unverified", queue: "unverified" };
 }
+
+export async function validateLemonLicenseKey(
+  licenseKey: string,
+  instanceName: string,
+): Promise<boolean> {
+  const trimmedLicenseKey = licenseKey.trim();
+  const trimmedInstanceName = instanceName.trim();
+
+  if (!trimmedLicenseKey || !trimmedInstanceName) {
+    return false;
+  }
+
+  const response = await fetch(
+    "https://api.lemonsqueezy.com/v1/licenses/validate",
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        license_key: trimmedLicenseKey,
+        instance_name: trimmedInstanceName,
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    return false;
+  }
+
+  const data = await response.json();
+
+  return data.valid === true && data.license_key?.status === "active";
+}
