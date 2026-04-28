@@ -15,3 +15,15 @@ Public pages show reviewed grouped issues. Raw reports, reporter follow-up, enti
 - `npm run lint`
 - `npm run test`
 - `npm run build`
+
+## Supabase Schema
+
+Apply migrations with the Supabase CLI after linking the project:
+
+If you see a zsh parse error, suspect smart quotes; retype quotes manually.
+```bash
+supabase link --project-ref "your-project-ref"
+supabase db push
+```
+
+The application uses the Supabase service key only in server-only admin flows. Never expose `SUPABASE_SECRET_KEY` to browser code.
