@@ -20,7 +20,12 @@ Public pages show reviewed grouped issues. Raw reports, reporter follow-up, enti
 ## Operations
 
 - [App report API](docs/APP_REPORT_API.md)
+- [Support reporting requirements](docs/SUPPORT_REPORTING_REQUIREMENTS.md)
 - [Deployment](docs/DEPLOYMENT.md)
+
+## Public Issues
+
+The GitHub repo is public and Issues are enabled. Public GitHub issues are for discussion and closure tracking only. Private diagnostics should go through the support report flow.
 
 ## Supabase Schema
 
