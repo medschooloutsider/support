@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { POST } from "@/app/api/app-reports/route";
 import {
@@ -11,9 +11,37 @@ import {
 import { buildReportInsert } from "@/lib/reports";
 
 const originalAppOriginSecret = process.env.APP_ORIGIN_HMAC_SECRET;
+const originalSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const originalSupabaseSecretKey = process.env.SUPABASE_SECRET_KEY;
+
+const supabaseMocks = vi.hoisted(() => ({
+  createClient: vi.fn(),
+  from: vi.fn(),
+  insert: vi.fn(),
+  select: vi.fn(),
+  single: vi.fn(),
+}));
+
+vi.mock("@supabase/supabase-js", () => ({
+  createClient: supabaseMocks.createClient,
+}));
+
+beforeEach(() => {
+  supabaseMocks.single.mockResolvedValue({
+    data: { id: "report-1", status: "unverified" },
+    error: null,
+  });
+  supabaseMocks.select.mockReturnValue({ single: supabaseMocks.single });
+  supabaseMocks.insert.mockReturnValue({ select: supabaseMocks.select });
+  supabaseMocks.from.mockReturnValue({ insert: supabaseMocks.insert });
+  supabaseMocks.createClient.mockReturnValue({ from: supabaseMocks.from });
+});
 
 afterEach(() => {
   process.env.APP_ORIGIN_HMAC_SECRET = originalAppOriginSecret;
+  process.env.NEXT_PUBLIC_SUPABASE_URL = originalSupabaseUrl;
+  process.env.SUPABASE_SECRET_KEY = originalSupabaseSecretKey;
+  vi.clearAllMocks();
 });
 
 describe("report schema", () => {
@@ -231,8 +259,10 @@ describe("POST /api/app-reports", () => {
     expect(response.status).toBe(400);
   });
 
-  it("denies invalid app-origin signatures before saving", async () => {
+  it("saves invalid app-origin signatures into the unverified queue", async () => {
     process.env.APP_ORIGIN_HMAC_SECRET = "test-secret";
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
+    process.env.SUPABASE_SECRET_KEY = "test-service-role-key";
 
     const response = await POST(
       new Request("https://example.com/api/app-reports", {
@@ -246,8 +276,15 @@ describe("POST /api/app-reports", () => {
     );
 
     await expect(response.json()).resolves.toEqual({
-      error: "Invalid app origin.",
+      reportId: "report-1",
+      status: "unverified",
     });
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(201);
+    expect(supabaseMocks.insert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        entitlement_kind: "unverified",
+        status: "unverified",
+      }),
+    );
   });
 });

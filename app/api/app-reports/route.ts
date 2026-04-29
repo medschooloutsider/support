@@ -29,16 +29,14 @@ export async function POST(request: NextRequest) {
   const signature = request.headers.get("x-support-signature") ?? "";
   const secret = process.env.APP_ORIGIN_HMAC_SECRET;
 
-  if (!secret) {
-    return jsonError("App report intake is not configured.", 500);
-  }
-
-  const appOriginValid = await verifyAppOriginSignature({
-    body: rawBody,
-    timestamp,
-    signature,
-    secret,
-  });
+  const appOriginValid = secret
+    ? await verifyAppOriginSignature({
+        body: rawBody,
+        timestamp,
+        signature,
+        secret,
+      })
+    : false;
 
   const parsedBody = parseJsonObject(rawBody);
 
@@ -64,9 +62,10 @@ export async function POST(request: NextRequest) {
     lemonValid: false,
   });
 
-  if (!entitlement.allowed) {
-    return jsonError("Invalid app origin.", 401);
-  }
+  const effectiveEntitlement =
+    entitlement.allowed || inputResult.data.source !== "app"
+      ? entitlement
+      : ({ allowed: true, kind: "unverified", queue: "unverified" } as const);
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseSecretKey = process.env.SUPABASE_SECRET_KEY;
@@ -80,8 +79,8 @@ export async function POST(request: NextRequest) {
   });
   const insert = buildReportInsert({
     input: inputResult.data,
-    entitlementKind: entitlement.kind,
-    queue: entitlement.queue,
+    entitlementKind: effectiveEntitlement.kind,
+    queue: effectiveEntitlement.queue,
     reporterUserId: null,
   });
 
