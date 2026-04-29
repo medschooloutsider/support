@@ -40,6 +40,7 @@ First implementation slice is complete, verified locally, pushed to GitHub, depl
   - GPT-MD `main` now points at `2e45e58`; fresh bundle built at `worktrees/GPT-MD-support-reporting-clean/dist/GPT-MD.app`, executable timestamp `2026-04-29 11:00:41 CEST`, SHA-256 prefix `dec8ae39df7caad3e3e83247f3f7d4b501bdce290e6d624bbb6262f423b98b96`.
   - PDF-MD `main` now points at `dadc77e`; fresh bundle built at `worktrees/PDF-MD-support-reporting-clean/dist/pdf.md.app`, executable timestamp `2026-04-29 11:01:16 CEST`, SHA-256 prefix `e11cd0e78daea5d8f3e704d9b6fee4fdaa61a7bce07337415b175466ab1129d5`.
   - Alarmist `main` now points at `8faaa7b`; focused macOS test rebuilt DerivedData app executable at `2026-04-29 11:00:43 CEST`, SHA-256 prefix `5cff8a5c346af9dd7e5f9e1049dccf458e822363cbed9bf8c14721f278d71d0e`.
+- Packaged nonfronting smoke passed for the exact rebuilt GPT-MD, PDF-MD, and Alarmist app paths: `open -g -n` launched each app, Chrome remained frontmost before and after launch, exact-path PIDs were observed, and only the newly launched PIDs were terminated.
 - Vercel project renamed to `medschooloutsider-support` under `earthpresident1030-3919s-projects`.
 - Active public support URL is `https://medschooloutsider-support.vercel.app`; live verification returned `200 OK` after SSO deployment protection was disabled.
 - Supabase project `zhfcplmoijyrempppipo` linked and `supabase/migrations/0001_initial_support_schema.sql` applied successfully.
@@ -53,4 +54,4 @@ First implementation slice is complete, verified locally, pushed to GitHub, depl
 - Replace placeholder Lemon Squeezy env vars if future code starts using private Lemon API credentials; current license validation route does not use the private Lemon API key.
 - Add a GitHub login connection in Vercel, then link `medschooloutsider/support` to the Vercel project.
 - Configure app-side support HMAC secrets outside source control before enabling direct submission in shipped builds.
-- Run visible/nonfronting UI smoke on the rebuilt app artifacts before handing them to users.
+- Optional deeper visible UI smoke can manually click through the Report Issue modal in each app; direct upload remains gated by out-of-source HMAC configuration.
