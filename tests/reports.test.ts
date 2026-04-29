@@ -4,6 +4,7 @@ import { POST } from "@/app/api/app-reports/route";
 import {
   APP_IDS,
   PUBLIC_STATUSES,
+  REPORT_CATEGORIES,
   REPORT_STATUSES,
   reportInputSchema,
 } from "@/lib/schema";
@@ -18,6 +19,14 @@ afterEach(() => {
 describe("report schema", () => {
   it("exposes the shared domain constants", () => {
     expect(APP_IDS).toEqual(["gpt_md", "pdf_md", "alarmist"]);
+    expect(REPORT_CATEGORIES).toEqual([
+      "bug",
+      "bad_output",
+      "missing_feature",
+      "purchase_access",
+      "safety",
+      "other",
+    ]);
     expect(PUBLIC_STATUSES).toEqual([
       "known",
       "being_resolved",
@@ -48,6 +57,59 @@ describe("report schema", () => {
     expect(result.success).toBe(true);
   });
 
+  it("requires diagnostics for app-originated reports", () => {
+    const result = reportInputSchema.safeParse({
+      appId: "gpt_md",
+      appVersion: "1.0.0",
+      appBuild: "42",
+      platform: "macOS",
+      osVersion: "15.4",
+      reporterEmail: "reporter@example.com",
+      category: "bug",
+      summary: "Export preview fails",
+      description:
+        "The export preview fails after choosing a valid Markdown file from the app.",
+      reproductionSteps:
+        "Open the app, choose a Markdown file, then start the export preview.",
+      expectedResult: "The preview should render.",
+      actualResult: "The preview stays blank.",
+      workflowContext: { surface: "export" },
+      source: "app",
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("validates a complete app-origin diagnostic report", () => {
+    const result = reportInputSchema.safeParse({
+      appId: "gpt_md",
+      appName: "GPT-MD",
+      appVersion: "1.0.0",
+      appBuild: "42",
+      platform: "macOS",
+      osVersion: "15.4",
+      reporterEmail: "reporter@example.com",
+      category: "bug",
+      summary: "Export preview fails",
+      description:
+        "The export preview fails after choosing a valid Markdown file from the app.",
+      reproductionSteps:
+        "Open the app, choose a Markdown file, then start the export preview.",
+      expectedResult: "The preview should render.",
+      actualResult: "The preview stays blank.",
+      workflowContext: { surface: "export", selectedFileType: "markdown" },
+      diagnostics: {
+        recentLog: "recent log tail",
+        lastError: "Preview stayed blank.",
+        stackTrace: ["frame 1", "frame 2"],
+        metadata: { exportMode: "preview" },
+      },
+      source: "app",
+    });
+
+    expect(result.success).toBe(true);
+  });
+
   it("rejects unexpected report status input", () => {
     const result = reportInputSchema.safeParse({
       appId: "gpt_md",
@@ -73,10 +135,13 @@ describe("report schema", () => {
 describe("buildReportInsert", () => {
   const input = {
     appId: "pdf_md",
+    appName: "PDF-MD",
     appVersion: "1.2.3",
+    appBuild: "456",
     platform: "macOS",
     osVersion: "15.4",
     reporterEmail: "reporter@example.com",
+    category: "bug",
     summary: "Export preview fails",
     description:
       "The export preview fails after choosing a valid Markdown file from the app.",
@@ -84,6 +149,8 @@ describe("buildReportInsert", () => {
       "Open the app, choose a Markdown file, then start the export preview.",
     expectedResult: "The preview should render.",
     actualResult: "The preview stays blank.",
+    workflowContext: { surface: "export" },
+    diagnostics: { recentLog: "recent log tail" },
     source: "app",
   } as const;
 
@@ -97,8 +164,13 @@ describe("buildReportInsert", () => {
       }),
     ).toMatchObject({
       app_id: "pdf_md",
+      app_name: "PDF-MD",
+      app_build: "456",
+      category: "bug",
       status: "new",
       entitlement_kind: "app_origin",
+      workflow_context: { surface: "export" },
+      diagnostics: { recentLog: "recent log tail" },
     });
   });
 
@@ -121,10 +193,13 @@ describe("buildReportInsert", () => {
 describe("POST /api/app-reports", () => {
   const payload = {
     appId: "pdf_md",
+    appName: "PDF-MD",
     appVersion: "1.2.3",
+    appBuild: "456",
     platform: "macOS",
     osVersion: "15.4",
     reporterEmail: "reporter@example.com",
+    category: "bug",
     summary: "Export preview fails",
     description:
       "The export preview fails after choosing a valid Markdown file from the app.",
@@ -132,6 +207,8 @@ describe("POST /api/app-reports", () => {
       "Open the app, choose a Markdown file, then start the export preview.",
     expectedResult: "The preview should render.",
     actualResult: "The preview stays blank.",
+    workflowContext: { surface: "export" },
+    diagnostics: { recentLog: "recent log tail" },
   };
 
   it("returns a controlled error for invalid JSON", async () => {
