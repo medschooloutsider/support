@@ -1,11 +1,19 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
+import { POST } from "@/app/api/app-reports/route";
 import {
   APP_IDS,
   PUBLIC_STATUSES,
   REPORT_STATUSES,
   reportInputSchema,
 } from "@/lib/schema";
+import { buildReportInsert } from "@/lib/reports";
+
+const originalAppOriginSecret = process.env.APP_ORIGIN_HMAC_SECRET;
+
+afterEach(() => {
+  process.env.APP_ORIGIN_HMAC_SECRET = originalAppOriginSecret;
+});
 
 describe("report schema", () => {
   it("exposes the shared domain constants", () => {
@@ -59,5 +67,110 @@ describe("report schema", () => {
     });
 
     expect(result.success).toBe(false);
+  });
+});
+
+describe("buildReportInsert", () => {
+  const input = {
+    appId: "pdf_md",
+    appVersion: "1.2.3",
+    platform: "macOS",
+    osVersion: "15.4",
+    reporterEmail: "reporter@example.com",
+    summary: "Export preview fails",
+    description:
+      "The export preview fails after choosing a valid Markdown file from the app.",
+    reproductionSteps:
+      "Open the app, choose a Markdown file, then start the export preview.",
+    expectedResult: "The preview should render.",
+    actualResult: "The preview stays blank.",
+    source: "app",
+  } as const;
+
+  it("maps verified app origin reports to new app-origin inserts", () => {
+    expect(
+      buildReportInsert({
+        input,
+        entitlementKind: "app_origin",
+        queue: "verified",
+        reporterUserId: null,
+      }),
+    ).toMatchObject({
+      app_id: "pdf_md",
+      status: "new",
+      entitlement_kind: "app_origin",
+    });
+  });
+
+  it("maps unverified reports to the unverified queue", () => {
+    expect(
+      buildReportInsert({
+        input: { ...input, source: "web" },
+        entitlementKind: "unverified",
+        queue: "unverified",
+        reporterUserId: null,
+      }),
+    ).toMatchObject({
+      app_id: "pdf_md",
+      status: "unverified",
+      entitlement_kind: "unverified",
+    });
+  });
+});
+
+describe("POST /api/app-reports", () => {
+  const payload = {
+    appId: "pdf_md",
+    appVersion: "1.2.3",
+    platform: "macOS",
+    osVersion: "15.4",
+    reporterEmail: "reporter@example.com",
+    summary: "Export preview fails",
+    description:
+      "The export preview fails after choosing a valid Markdown file from the app.",
+    reproductionSteps:
+      "Open the app, choose a Markdown file, then start the export preview.",
+    expectedResult: "The preview should render.",
+    actualResult: "The preview stays blank.",
+  };
+
+  it("returns a controlled error for invalid JSON", async () => {
+    process.env.APP_ORIGIN_HMAC_SECRET = "test-secret";
+
+    const response = await POST(
+      new Request("https://example.com/api/app-reports", {
+        method: "POST",
+        headers: {
+          "x-support-timestamp": "1777420800",
+          "x-support-signature": "invalid",
+        },
+        body: "{",
+      }) as never,
+    );
+
+    await expect(response.json()).resolves.toEqual({
+      error: "Invalid JSON body.",
+    });
+    expect(response.status).toBe(400);
+  });
+
+  it("denies invalid app-origin signatures before saving", async () => {
+    process.env.APP_ORIGIN_HMAC_SECRET = "test-secret";
+
+    const response = await POST(
+      new Request("https://example.com/api/app-reports", {
+        method: "POST",
+        headers: {
+          "x-support-timestamp": "1777420800",
+          "x-support-signature": "invalid",
+        },
+        body: JSON.stringify(payload),
+      }) as never,
+    );
+
+    await expect(response.json()).resolves.toEqual({
+      error: "Invalid app origin.",
+    });
+    expect(response.status).toBe(401);
   });
 });
