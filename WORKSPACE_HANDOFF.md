@@ -28,6 +28,10 @@ First implementation slice is complete, verified locally, pushed to GitHub, depl
 - App-side maximal diagnostics requirements are recorded in `docs/SUPPORT_REPORTING_REQUIREMENTS.md`.
 - Diagnostic API fields for `app_name`, `app_build`, `category`, `workflow_context`, and `diagnostics` are merged, deployed, and applied to production Supabase through `supabase/migrations/0002_app_diagnostics.sql`.
 - Production deployment `dpl_EfbtGHQL2Nt2wZPYZyu5nyVpdCFg` is aliased to `https://medschooloutsider-support.vercel.app`; live API checks returned `422` for a missing diagnostics packet and `401` for a complete payload with an invalid app-origin signature.
+- App-side support reporting branches are pushed:
+  - GPT-MD: `codex/gpt-md-support-reporting` at `5bcca3a`.
+  - PDF-MD: `codex/pdf-md-support-reporting` at `f66a4e1`.
+  - Alarmist: `codex/alarmist-support-reporting` at `f0d13a7`.
 - Vercel project renamed to `medschooloutsider-support` under `earthpresident1030-3919s-projects`.
 - Active public support URL is `https://medschooloutsider-support.vercel.app`; live verification returned `200 OK` after SSO deployment protection was disabled.
 - Supabase project `zhfcplmoijyrempppipo` linked and `supabase/migrations/0001_initial_support_schema.sql` applied successfully.
@@ -40,4 +44,5 @@ First implementation slice is complete, verified locally, pushed to GitHub, depl
 
 - Replace placeholder Lemon Squeezy env vars if future code starts using private Lemon API credentials; current license validation route does not use the private Lemon API key.
 - Add a GitHub login connection in Vercel, then link `medschooloutsider/support` to the Vercel project.
-- Add app-side Report Issue buttons and diagnostic packet builders in GPT-MD, PDF-MD, and Alarmist.
+- Review and merge the app-side support reporting branches into their app `main` lanes when ready.
+- Configure app-side support HMAC secrets outside source control before enabling direct submission in shipped builds.
