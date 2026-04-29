@@ -32,6 +32,10 @@ First implementation slice is complete, verified locally, pushed to GitHub, depl
   - GPT-MD: `codex/gpt-md-support-reporting` at `5bcca3a`.
   - PDF-MD: `codex/pdf-md-support-reporting` at `f66a4e1`.
   - Alarmist: `codex/alarmist-support-reporting` at `f0d13a7`.
+- Clean support-only PR branches are also pushed against each GitHub `origin/main`:
+  - GPT-MD: `codex/gpt-md-support-reporting-clean` at `2e45e58`; verified `swift build -c debug --product ChatGPTColumnReview` and `git diff --check`.
+  - PDF-MD: `codex/pdf-md-support-reporting-clean` at `dadc77e`; verified `swift test --filter SupportReportingTests` and `git diff --check`.
+  - Alarmist: `codex/alarmist-support-reporting-clean` at `8faaa7b`; verified `xcodebuild -project "Alarmist.xcodeproj" -scheme "Alarmist" -destination "platform=macOS" -only-testing:AlarmistTests/AlarmistSupportReportTests test` and `git diff --check`.
 - Vercel project renamed to `medschooloutsider-support` under `earthpresident1030-3919s-projects`.
 - Active public support URL is `https://medschooloutsider-support.vercel.app`; live verification returned `200 OK` after SSO deployment protection was disabled.
 - Supabase project `zhfcplmoijyrempppipo` linked and `supabase/migrations/0001_initial_support_schema.sql` applied successfully.
@@ -44,5 +48,5 @@ First implementation slice is complete, verified locally, pushed to GitHub, depl
 
 - Replace placeholder Lemon Squeezy env vars if future code starts using private Lemon API credentials; current license validation route does not use the private Lemon API key.
 - Add a GitHub login connection in Vercel, then link `medschooloutsider/support` to the Vercel project.
-- Review and merge the app-side support reporting branches into their app `main` lanes when ready.
+- Review and merge the clean app-side support reporting branches into their app `main` lanes when ready.
 - Configure app-side support HMAC secrets outside source control before enabling direct submission in shipped builds.
