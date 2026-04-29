@@ -26,7 +26,8 @@ First implementation slice is complete, verified locally, pushed to GitHub, depl
 - Public GitHub repo created and pushed: `https://github.com/medschooloutsider/support`.
 - Public GitHub Issues are enabled for `medschooloutsider/support`; issue templates route public-safe discussion to GitHub and private diagnostics to the support site.
 - App-side maximal diagnostics requirements are recorded in `docs/SUPPORT_REPORTING_REQUIREMENTS.md`.
-- Diagnostic API branch adds private app diagnostic fields for `app_name`, `app_build`, `category`, `workflow_context`, and `diagnostics`; migration is `supabase/migrations/0002_app_diagnostics.sql`.
+- Diagnostic API fields for `app_name`, `app_build`, `category`, `workflow_context`, and `diagnostics` are merged, deployed, and applied to production Supabase through `supabase/migrations/0002_app_diagnostics.sql`.
+- Production deployment `dpl_EfbtGHQL2Nt2wZPYZyu5nyVpdCFg` is aliased to `https://medschooloutsider-support.vercel.app`; live API checks returned `422` for a missing diagnostics packet and `401` for a complete payload with an invalid app-origin signature.
 - Vercel project renamed to `medschooloutsider-support` under `earthpresident1030-3919s-projects`.
 - Active public support URL is `https://medschooloutsider-support.vercel.app`; live verification returned `200 OK` after SSO deployment protection was disabled.
 - Supabase project `zhfcplmoijyrempppipo` linked and `supabase/migrations/0001_initial_support_schema.sql` applied successfully.
@@ -39,5 +40,4 @@ First implementation slice is complete, verified locally, pushed to GitHub, depl
 
 - Replace placeholder Lemon Squeezy env vars if future code starts using private Lemon API credentials; current license validation route does not use the private Lemon API key.
 - Add a GitHub login connection in Vercel, then link `medschooloutsider/support` to the Vercel project.
-- Apply `supabase/migrations/0002_app_diagnostics.sql` to production Supabase after merging the diagnostic API branch.
 - Add app-side Report Issue buttons and diagnostic packet builders in GPT-MD, PDF-MD, and Alarmist.
