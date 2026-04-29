@@ -10,3 +10,4 @@ Append new entries at the end of this file.
 
 - 2026-04-29 00:00 CEST | bootstrap | Created the support site repo coordination log.
 - 2026-04-29 01:00 CEST | scaffold | Created the fresh Next.js support repo with support-specific homepage copy, metadata, lint/test/build verification, shared issue schema validation, and the initial Supabase database migration.
+- 2026-04-29 02:07 CEST | public issues | Added public issue status badge/card components plus reviewed issue list and detail pages backed by `public_issues`; verification passed lint, tests, build, and diff whitespace checks.
