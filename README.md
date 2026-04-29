@@ -14,7 +14,13 @@ Public pages show reviewed grouped issues. Raw reports, reporter follow-up, enti
 
 - `npm run lint`
 - `npm run test`
+- `npm run e2e`
 - `npm run build`
+
+## Operations
+
+- [App report API](docs/APP_REPORT_API.md)
+- [Deployment](docs/DEPLOYMENT.md)
 
 ## Supabase Schema
 
