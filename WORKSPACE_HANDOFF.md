@@ -1,6 +1,6 @@
 # Workspace Handoff
 
-Updated: 2026-04-29
+Updated: 2026-05-01 17:23 CEST
 
 ## Lane
 
@@ -38,6 +38,11 @@ First implementation slice is complete, verified locally, pushed to GitHub, depl
   - Live Vercel `POST /api/app-reports` accepted valid GPT-MD smoke report `5596d14e-584b-4cce-bfa6-316698546aa5` with HTTP 201 and status `unverified`.
   - Live Vercel `POST /api/app-reports` accepted valid PDF-MD smoke report `1f0ef8c4-7b30-47ac-8b24-c1f4d78280c3` with HTTP 201 and status `unverified`.
   - `/issues` returned HTTP 200; `/admin/reports` remained owner auth-gated with HTTP 307.
+- Stale reporting worktrees were retired on 2026-05-01 after current app/support `main` branches were confirmed to carry the required fixes:
+  - Retired worktrees: `GPT-MD-support-reporting`, `GPT-MD-support-reporting-clean`, `PDF-MD-support-reporting`, `PDF-MD-support-reporting-clean`, and `support-diagnostics-api`.
+  - Recovery archive: `/Volumes/DATA_ARCHIVE/Hub_Network/20_App_And_Tool_Hubs/AppDev_Hub/archives/support-reporting-worktree-retirement-20260501_172023`.
+  - Original folders moved to macOS Trash: `/Volumes/DATA_ARCHIVE/.Trashes/501/support-reporting-worktree-retirement-20260501_172023`.
+  - Archive contains verified ref bundles plus source/status/patch snapshots; branch refs remain intact and were not deleted.
 - Clean support-only PR branches are also pushed against each GitHub `origin/main`:
   - GPT-MD: `codex/gpt-md-support-reporting-clean` at `2e45e58`; verified `swift build -c debug --product ChatGPTColumnReview` and `git diff --check`.
   - PDF-MD: `codex/pdf-md-support-reporting-clean` at `dadc77e`; verified `swift test --filter SupportReportingTests` and `git diff --check`.
@@ -62,6 +67,7 @@ First implementation slice is complete, verified locally, pushed to GitHub, depl
 - Add a GitHub login connection in Vercel, then link `medschooloutsider/support` to the Vercel project.
 - Configure app-side support HMAC secrets outside source control before enabling direct submission in shipped builds.
 - Optional deeper visible UI smoke can manually click through the Report Issue modal in each app; direct upload remains gated by out-of-source HMAC configuration.
+- Optional branch deletion remains separate and requires explicit approval; the retired reporting branch refs were intentionally preserved for recovery.
 
 ## Production Proof 2026-05-01
 
