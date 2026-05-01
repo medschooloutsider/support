@@ -62,3 +62,13 @@ First implementation slice is complete, verified locally, pushed to GitHub, depl
 - Add a GitHub login connection in Vercel, then link `medschooloutsider/support` to the Vercel project.
 - Configure app-side support HMAC secrets outside source control before enabling direct submission in shipped builds.
 - Optional deeper visible UI smoke can manually click through the Report Issue modal in each app; direct upload remains gated by out-of-source HMAC configuration.
+
+## Production Proof 2026-05-01
+
+- Alarmist iPhone/iPad Settings > Support > Report Issue hardware UI proof submitted real reports through the deployed Vercel API into production Supabase.
+- Latest production Alarmist report IDs from physical device proof:
+  - `1c21793f-0723-4d6b-8614-0598045007d7`
+  - `670adb62-83f1-4141-86e1-8b156a423b3a`
+- Vercel was redeployed from this repo as `dpl_HJpJdaRAbuHAdPrgDaH38ZDeKgmz` and `https://medschooloutsider-support.vercel.app` was re-aliased to that fresh deployment.
+- Owner admin proof passed against the canonical URL: report queue and report detail returned HTTP 200, showed the Alarmist report, reporter email, version/platform, workflow context, private diagnostics including `recentLog`, and review controls for owner triage.
+- Evidence: `QA/support-report-visible-smoke/20260501_live_admin_canonical_fixed/summary.json`, `admin-report-queue.png`, and `admin-report-detail.png`.
