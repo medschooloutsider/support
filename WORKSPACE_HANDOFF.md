@@ -33,6 +33,11 @@ First implementation slice is complete, verified locally, pushed to GitHub, depl
   - GPT-MD: `codex/gpt-md-support-reporting` at `5bcca3a`.
   - PDF-MD: `codex/pdf-md-support-reporting` at `f66a4e1`.
   - Alarmist: `codex/alarmist-support-reporting` at `f0d13a7`.
+- Production app-report intake e2e passed on 2026-05-01:
+  - `npm run test` passed with 41 tests, `npm run build` passed, and `git diff --check` passed on support `main`.
+  - Live Vercel `POST /api/app-reports` accepted valid GPT-MD smoke report `5596d14e-584b-4cce-bfa6-316698546aa5` with HTTP 201 and status `unverified`.
+  - Live Vercel `POST /api/app-reports` accepted valid PDF-MD smoke report `1f0ef8c4-7b30-47ac-8b24-c1f4d78280c3` with HTTP 201 and status `unverified`.
+  - `/issues` returned HTTP 200; `/admin/reports` remained owner auth-gated with HTTP 307.
 - Clean support-only PR branches are also pushed against each GitHub `origin/main`:
   - GPT-MD: `codex/gpt-md-support-reporting-clean` at `2e45e58`; verified `swift build -c debug --product ChatGPTColumnReview` and `git diff --check`.
   - PDF-MD: `codex/pdf-md-support-reporting-clean` at `dadc77e`; verified `swift test --filter SupportReportingTests` and `git diff --check`.
