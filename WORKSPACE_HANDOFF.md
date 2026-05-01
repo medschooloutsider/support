@@ -26,6 +26,7 @@ First implementation slice is complete, verified locally, pushed to GitHub, depl
 - Public GitHub repo created and pushed: `https://github.com/medschooloutsider/support`.
 - Public GitHub Issues are enabled for `medschooloutsider/support`; issue templates route public-safe discussion to GitHub and private diagnostics to the support site.
 - App-side maximal diagnostics requirements are recorded in `docs/SUPPORT_REPORTING_REQUIREMENTS.md`.
+- Entitlement adapters now cover both Lemon Squeezy license validation and Apple receipt validation for the supported app purchase paths.
 - Diagnostic API fields for `app_name`, `app_build`, `category`, `workflow_context`, and `diagnostics` are merged, deployed, and applied to production Supabase through `supabase/migrations/0002_app_diagnostics.sql`.
 - Production deployment `dpl_EfbtGHQL2Nt2wZPYZyu5nyVpdCFg` is aliased to `https://medschooloutsider-support.vercel.app`; live API checks returned `422` for a missing diagnostics packet and `401` for a complete payload with an invalid app-origin signature.
 - App-side support reporting branches are pushed:
@@ -52,6 +53,7 @@ First implementation slice is complete, verified locally, pushed to GitHub, depl
 ## Left To Do
 
 - Replace placeholder Lemon Squeezy env vars if future code starts using private Lemon API credentials; current license validation route does not use the private Lemon API key.
+- Set `APPLE_RECEIPT_SHARED_SECRET` in Vercel if Apple receipt validation is enabled for the support adapter.
 - Add a GitHub login connection in Vercel, then link `medschooloutsider/support` to the Vercel project.
 - Configure app-side support HMAC secrets outside source control before enabling direct submission in shipped builds.
 - Optional deeper visible UI smoke can manually click through the Report Issue modal in each app; direct upload remains gated by out-of-source HMAC configuration.

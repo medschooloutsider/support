@@ -18,7 +18,7 @@ Build a public support hub for Med School Outsider apps where users can read rev
 - Raw reports stay private unless the owner manually publishes summarized content.
 - Public issue status vocabulary is `known`, `being_resolved`, and `to_be_resolved`.
 - Website reports require verified email and purchase verification where available.
-- App-originated reports are accepted through a signed support API and treated as app-trusted.
+- App-originated reports with valid support API signatures are treated as app-trusted; unsigned or invalidly signed app payloads are accepted into the unverified owner-review queue.
 
 ## Execution Model
 

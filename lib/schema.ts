@@ -29,6 +29,7 @@ export const reportCategorySchema = z.enum(REPORT_CATEGORIES);
 export const publicStatusSchema = z.enum(PUBLIC_STATUSES);
 export const reportStatusSchema = z.enum(REPORT_STATUSES);
 export const reportSourceSchema = z.enum(REPORT_SOURCES);
+export const reportReviewStatusSchema = z.enum(["new", "needs_info", "closed"]);
 
 type JsonValue =
   | string
@@ -131,9 +132,23 @@ export const reportInputSchema = z
     }
   });
 
+export const publicIssueDraftSchema = z
+  .object({
+    title: z.string().trim().min(8).max(120),
+    summary: z.string().trim().min(20).max(5000),
+    status: publicStatusSchema,
+    affectedVersions: z.string().trim().min(1).max(200).optional(),
+    affectedPlatforms: z.string().trim().min(1).max(200).optional(),
+    workaround: z.string().trim().min(1).max(5000).optional(),
+    resolutionNotes: z.string().trim().min(1).max(5000).optional(),
+  })
+  .strict();
+
 export type AppId = z.infer<typeof appIdSchema>;
 export type ReportCategory = z.infer<typeof reportCategorySchema>;
 export type PublicStatus = z.infer<typeof publicStatusSchema>;
 export type ReportStatus = z.infer<typeof reportStatusSchema>;
 export type ReportSource = z.infer<typeof reportSourceSchema>;
 export type ReportInput = z.infer<typeof reportInputSchema>;
+export type ReportReviewStatus = z.infer<typeof reportReviewStatusSchema>;
+export type PublicIssueDraft = z.infer<typeof publicIssueDraftSchema>;

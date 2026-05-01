@@ -13,11 +13,12 @@ Set these variables in the Vercel project before release:
 - `SUPABASE_SECRET_KEY`
 - `LEMON_SQUEEZY_API_KEY`
 - `LEMON_SQUEEZY_STORE_ID`
+- `APPLE_RECEIPT_SHARED_SECRET`
 - `APP_ORIGIN_HMAC_SECRET`
 - `OWNER_EMAIL`
 - `NEXT_PUBLIC_SITE_URL`
 
-`SUPABASE_SECRET_KEY`, `LEMON_SQUEEZY_API_KEY`, and `APP_ORIGIN_HMAC_SECRET` are server-only secrets. Do not expose them to browser code or public logs.
+`SUPABASE_SECRET_KEY`, `LEMON_SQUEEZY_API_KEY`, `APP_ORIGIN_HMAC_SECRET`, and `APPLE_RECEIPT_SHARED_SECRET` are server-only values. Do not expose them to browser code or public logs.
 
 Set `NEXT_PUBLIC_SITE_URL` to `https://support.medschooloutsider.com` for production.
 
