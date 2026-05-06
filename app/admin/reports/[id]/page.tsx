@@ -86,7 +86,7 @@ function DetailSection({
       <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
         {title}
       </h2>
-      <div className="mt-3 whitespace-pre-wrap text-sm leading-6 text-zinc-700">
+      <div className="mt-3 min-w-0 whitespace-pre-wrap break-words text-sm leading-6 text-zinc-700 [overflow-wrap:anywhere]">
         {children}
       </div>
     </section>
@@ -191,7 +191,7 @@ export default async function AdminReportPage({
           </p>
         </div>
 
-        <div className="mt-10 rounded-md border border-zinc-200 bg-white px-6">
+        <div className="mt-10 overflow-hidden rounded-md border border-zinc-200 bg-white px-6">
           <DetailSection title="Review actions">
             <div className="space-y-6">
               <div>
