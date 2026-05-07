@@ -25,12 +25,18 @@ export default async function AdminPage() {
           status.
         </p>
         </div>
-        <div className="border-t border-[var(--rule)] p-4">
+        <div className="flex flex-col gap-3 border-t border-[var(--rule)] p-4 sm:flex-row">
           <Link
             href="/admin/reports"
             className="button-primary"
           >
             View report queue
+          </Link>
+          <Link
+            href="/admin/account"
+            className="button-secondary"
+          >
+            Change password
           </Link>
         </div>
       </section>

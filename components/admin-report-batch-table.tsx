@@ -1,9 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 
-import { bulkSetReportStatusAction } from "@/app/admin/reports/actions";
+import {
+  bulkSetReportStatusAction,
+  prepareCodexTriageAction,
+  type CodexTriageState,
+} from "@/app/admin/reports/actions";
 
 type ReportQueueRow = {
   id: string;
@@ -37,6 +41,10 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
+const initialCodexState: CodexTriageState = {
+  message: "",
+};
+
 export function AdminReportBatchTable({
   reports,
   returnPath,
@@ -45,6 +53,11 @@ export function AdminReportBatchTable({
   returnPath: string;
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [copyMessage, setCopyMessage] = useState("");
+  const [codexState, codexAction, isPreparingCodex] = useActionState(
+    prepareCodexTriageAction,
+    initialCodexState,
+  );
   const allSelected = reports.length > 0 && selected.size === reports.length;
   const selectedCount = selected.size;
   const selectedReports = useMemo(
@@ -79,13 +92,19 @@ export function AdminReportBatchTable({
     });
   }
 
-  return (
-    <form action={bulkSetReportStatusAction} className="flex flex-col gap-4">
-      <input type="hidden" name="returnPath" value={returnPath} />
-      {Array.from(selected).map((reportId) => (
-        <input key={reportId} type="hidden" name="reportId" value={reportId} />
-      ))}
+  async function copyCodexBundle() {
+    if (!codexState.bundle) {
+      return;
+    }
 
+    await navigator.clipboard.writeText(codexState.bundle);
+    setCopyMessage("Copied Codex triage bundle.");
+  }
+
+  const selectedIds = Array.from(selected);
+
+  return (
+    <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-3 rounded-lg border border-[var(--rule)] bg-white p-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <p className="font-mono text-xs font-semibold uppercase tracking-wide text-[var(--green)]">
@@ -95,25 +114,85 @@ export function AdminReportBatchTable({
             {selectedCount} selected / {selectedStatusSummary}
           </p>
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <select
-            name="nextStatus"
-            defaultValue="needs_info"
-            className="h-11 rounded-md border border-[var(--rule-dark)] bg-white px-3 text-sm text-[var(--ink)]"
+        <div className="flex flex-col gap-2 xl:flex-row">
+          <form action={codexAction} className="flex flex-col gap-2 sm:flex-row">
+            {selectedIds.map((reportId) => (
+              <input key={reportId} type="hidden" name="reportId" value={reportId} />
+            ))}
+            <button
+              type="submit"
+              disabled={selectedCount === 0 || isPreparingCodex}
+              className="button-secondary disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isPreparingCodex ? "Preparing Codex triage" : "Prepare Codex triage"}
+            </button>
+          </form>
+          <form
+            action={bulkSetReportStatusAction}
+            className="flex flex-col gap-2 sm:flex-row"
           >
-            <option value="new">Mark new</option>
-            <option value="needs_info">Needs info</option>
-            <option value="closed">Close</option>
-          </select>
-          <button
-            type="submit"
-            disabled={selectedCount === 0}
-            className="button-primary disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Apply to selected
-          </button>
+            <input type="hidden" name="returnPath" value={returnPath} />
+            {selectedIds.map((reportId) => (
+              <input key={reportId} type="hidden" name="reportId" value={reportId} />
+            ))}
+            <select
+              name="nextStatus"
+              defaultValue="needs_info"
+              className="h-11 rounded-md border border-[var(--rule-dark)] bg-white px-3 text-sm text-[var(--ink)]"
+            >
+              <option value="new">Mark new</option>
+              <option value="needs_info">Needs info</option>
+              <option value="closed">Close</option>
+            </select>
+            <button
+              type="submit"
+              disabled={selectedCount === 0}
+              className="button-primary disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Apply to selected
+            </button>
+          </form>
         </div>
       </div>
+
+      {codexState.message ? (
+        <section className="rounded-lg border border-[var(--rule)] bg-white p-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="font-mono text-xs font-semibold uppercase tracking-wide text-[var(--green)]">
+                Codex triage draft
+              </p>
+              <p className="mt-1 text-sm text-[var(--muted)]">
+                {codexState.message}
+              </p>
+              <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
+                Draft-only: Codex may suggest categories, clusters, summaries,
+                and public issue text. Owner approval is still required for
+                status changes, closures, and publication.
+              </p>
+            </div>
+            {codexState.bundle ? (
+              <button
+                type="button"
+                onClick={copyCodexBundle}
+                className="button-secondary"
+              >
+                Copy bundle
+              </button>
+            ) : null}
+          </div>
+          {codexState.bundle ? (
+            <textarea
+              readOnly
+              value={codexState.bundle}
+              className="mt-4 h-72 w-full rounded-md border border-[var(--rule)] bg-[var(--steel)] p-3 font-mono text-xs leading-5 text-[var(--ink)]"
+            />
+          ) : null}
+          {copyMessage ? (
+            <p className="mt-2 text-sm text-[var(--green)]">{copyMessage}</p>
+          ) : null}
+        </section>
+      ) : null}
 
       <div className="overflow-hidden rounded-lg border border-[var(--rule)] bg-white">
         <div className="overflow-x-auto">
@@ -202,6 +281,6 @@ export function AdminReportBatchTable({
           </table>
         </div>
       </div>
-    </form>
+    </div>
   );
 }

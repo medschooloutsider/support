@@ -1,6 +1,16 @@
 import { LoginForm } from "@/components/login-form";
 
-export default function LoginPage() {
+type LoginPageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const query = searchParams ? await searchParams : {};
+  const message =
+    query.message === "password_changed"
+      ? "Password changed. Sign in again with the new password."
+      : null;
+
   return (
     <main className="support-shell">
       <section className="support-panel mx-auto max-w-2xl">
@@ -16,6 +26,11 @@ export default function LoginPage() {
         </p>
         </div>
         <div className="p-4">
+        {message ? (
+          <p className="mb-4 rounded-md border border-[var(--rule)] bg-[var(--green-soft)] px-3 py-2 text-sm text-[var(--green)]">
+            {message}
+          </p>
+        ) : null}
         <LoginForm />
         </div>
       </section>
