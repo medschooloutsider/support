@@ -2,16 +2,21 @@ import { ReportForm } from "@/components/report-form";
 
 export default function ReportPage() {
   return (
-    <main className="min-h-screen bg-zinc-50 px-6 py-16 text-zinc-950">
-      <section className="mx-auto w-full max-w-3xl">
-        <h1 className="text-4xl font-semibold tracking-tight">
+    <main className="support-shell">
+      <section className="support-panel">
+        <div className="support-panel-header">
+        <p className="kicker">Private intake</p>
+        <h1 className="hero-title">
           Report an issue
         </h1>
-        <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-600">
+        <p className="subtitle">
           Share what happened in GPT-MD, PDF-MD, or Alarmist. Reports are
           private until reviewed.
         </p>
+        </div>
+        <div className="p-4">
         <ReportForm />
+        </div>
       </section>
     </main>
   );

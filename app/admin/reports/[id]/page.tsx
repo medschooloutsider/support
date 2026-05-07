@@ -160,38 +160,40 @@ export default async function AdminReportPage({
   const resolutionNotesValue = linkedIssue?.resolution_notes ?? "";
 
   return (
-    <main className="min-h-screen bg-zinc-50 px-6 py-16 text-zinc-950">
-      <article className="mx-auto w-full max-w-3xl">
+    <main className="support-shell-wide">
+      <article className="support-panel">
+        <div className="support-panel-header">
         <Link
           href="/admin/reports"
-          className="text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-950"
+          className="text-sm font-medium text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
         >
           Back to reports
         </Link>
         {noticeText ? (
-          <p className="mt-6 rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-700">
+          <p className="mt-6 rounded-md border border-[var(--rule)] bg-white px-4 py-3 text-sm text-[var(--muted)]">
             {noticeText}
           </p>
         ) : null}
         <div className="mt-8">
-          <p className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+          <p className="kicker">
             {report.app_name ?? report.app_id} / {reportStatus}
           </p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight">
+          <h1 className="hero-title">
             {report.summary}
           </h1>
-          <p className="mt-4 text-sm text-zinc-600">
+          <p className="mt-4 text-sm text-[var(--muted)]">
             Reporter: {report.reporter_email}
           </p>
-          <p className="mt-2 text-sm text-zinc-600">
+          <p className="mt-2 text-sm text-[var(--muted)]">
             Version: {report.app_version}
             {report.app_build ? ` (${report.app_build})` : ""} /{" "}
             {report.platform} {report.os_version}
             {report.category ? ` / ${report.category}` : ""}
           </p>
         </div>
+        </div>
 
-        <div className="mt-10 overflow-hidden rounded-md border border-zinc-200 bg-white px-6">
+        <div className="overflow-hidden bg-white px-6">
           <DetailSection title="Review actions">
             <div className="space-y-6">
               <div>

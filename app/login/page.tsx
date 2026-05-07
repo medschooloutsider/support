@@ -2,18 +2,22 @@ import { LoginForm } from "@/components/login-form";
 
 export default function LoginPage() {
   return (
-    <main className="min-h-screen bg-zinc-50 px-6 py-16 text-zinc-950">
-      <section className="mx-auto w-full max-w-md">
-        <p className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+    <main className="support-shell">
+      <section className="support-panel mx-auto max-w-2xl">
+        <div className="support-panel-header">
+        <p className="kicker">
           Owner access
         </p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight">
+        <h1 className="hero-title">
           Support admin login
         </h1>
-        <p className="mt-4 text-base leading-7 text-zinc-600">
+        <p className="subtitle">
           Sign in to review private support reports and publish issue updates.
         </p>
+        </div>
+        <div className="p-4">
         <LoginForm />
+        </div>
       </section>
     </main>
   );

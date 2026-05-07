@@ -12,12 +12,12 @@ const initialState: ReportFormState = {
 };
 
 const inputClassName =
-  "mt-2 h-11 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-950 outline-none transition-colors focus:border-zinc-950";
+  "mt-2 h-11 w-full rounded-md border border-[var(--rule-dark)] bg-white px-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--green)]";
 
 const textareaClassName =
-  "mt-2 min-h-28 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm leading-6 text-zinc-950 outline-none transition-colors focus:border-zinc-950";
+  "mt-2 min-h-28 w-full rounded-md border border-[var(--rule-dark)] bg-white px-3 py-2 text-sm leading-6 text-[var(--ink)] outline-none transition-colors focus:border-[var(--green)]";
 
-const labelClassName = "text-sm font-medium text-zinc-950";
+const labelClassName = "text-sm font-medium text-[var(--ink)]";
 
 export function ReportForm() {
   const [state, formAction, isPending] = useActionState(
@@ -26,7 +26,7 @@ export function ReportForm() {
   );
 
   return (
-    <form action={formAction} className="mt-8 space-y-6">
+    <form action={formAction} className="flex flex-col gap-6">
       <div className="grid gap-5 sm:grid-cols-2">
         <label className={labelClassName}>
           App
@@ -158,12 +158,12 @@ export function ReportForm() {
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex h-11 items-center justify-center rounded-md bg-zinc-950 px-5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-400"
+          className="button-primary disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isPending ? "Submitting" : "Submit report"}
         </button>
         {state.message ? (
-          <p className="text-sm leading-6 text-zinc-600">{state.message}</p>
+          <p className="text-sm leading-6 text-[var(--muted)]">{state.message}</p>
         ) : null}
       </div>
     </form>

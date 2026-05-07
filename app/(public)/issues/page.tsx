@@ -20,13 +20,16 @@ export default async function IssuesPage() {
     .returns<PublicIssueRow[]>();
 
   return (
-    <main className="min-h-screen bg-zinc-50 px-6 py-16 text-zinc-950">
-      <section className="mx-auto w-full max-w-3xl">
-        <h1 className="text-4xl font-semibold tracking-tight">Support issues</h1>
-        <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-600">
+    <main className="support-shell">
+      <section className="support-panel">
+        <div className="support-panel-header">
+        <p className="kicker">Reviewed status</p>
+        <h1 className="hero-title">Support issues</h1>
+        <p className="subtitle">
           Reviewed public status for GPT-MD, PDF-MD, and Alarmist.
         </p>
-        <div className="mt-8 space-y-4">
+        </div>
+        <div className="flex flex-col gap-4 p-4">
           {issues?.length ? (
             issues.map((issue) => (
               <IssueCard
@@ -40,7 +43,7 @@ export default async function IssuesPage() {
               />
             ))
           ) : (
-            <p className="rounded-md border border-zinc-200 bg-white p-5 text-sm text-zinc-600">
+            <p className="rounded-md border border-[var(--rule)] bg-white p-5 text-sm text-[var(--muted)]">
               No public support issues have been published yet.
             </p>
           )}

@@ -9,7 +9,7 @@ const initialState: LoginState = {
 };
 
 const inputClassName =
-  "mt-2 h-11 w-full rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-950 outline-none transition-colors focus:border-zinc-950";
+  "mt-2 h-11 w-full rounded-md border border-[var(--rule-dark)] bg-white px-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--green)]";
 
 export function LoginForm() {
   const [state, formAction, isPending] = useActionState(
@@ -18,8 +18,8 @@ export function LoginForm() {
   );
 
   return (
-    <form action={formAction} className="mt-8 space-y-5">
-      <label className="block text-sm font-medium text-zinc-950">
+    <form action={formAction} className="flex flex-col gap-5">
+      <label className="block text-sm font-medium text-[var(--ink)]">
         Owner email
         <input
           name="email"
@@ -29,7 +29,7 @@ export function LoginForm() {
           className={inputClassName}
         />
       </label>
-      <label className="block text-sm font-medium text-zinc-950">
+      <label className="block text-sm font-medium text-[var(--ink)]">
         Password
         <input
           name="password"
@@ -43,12 +43,12 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex h-11 items-center justify-center rounded-md bg-zinc-950 px-5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-400"
+          className="button-primary disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isPending ? "Signing in" : "Sign in"}
         </button>
         {state.message ? (
-          <p className="text-sm leading-6 text-zinc-600">{state.message}</p>
+          <p className="text-sm leading-6 text-[var(--muted)]">{state.message}</p>
         ) : null}
       </div>
     </form>

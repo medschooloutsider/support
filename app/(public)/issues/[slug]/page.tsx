@@ -42,63 +42,67 @@ export default async function IssuePage({ params }: IssuePageProps) {
   }).format(new Date(issue.updated_at));
 
   return (
-    <main className="min-h-screen bg-zinc-50 px-6 py-16 text-zinc-950">
-      <article className="mx-auto w-full max-w-3xl">
+    <main className="support-shell">
+      <article className="support-panel">
+        <div className="support-panel-header">
         <Link
           href="/issues"
-          className="text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-950"
+          className="text-sm font-medium text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
         >
           Back to issues
         </Link>
         <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+            <p className="kicker">
               {issue.app_id}
             </p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight">
+            <h1 className="hero-title">
               {issue.title}
             </h1>
           </div>
           <StatusBadge status={issue.status} />
         </div>
-        <p className="mt-5 text-base leading-7 text-zinc-600">{issue.summary}</p>
-        <p className="mt-4 text-sm text-zinc-500">Updated {formattedDate}</p>
+        <p className="mt-5 max-w-4xl text-base leading-7 text-[var(--muted)]">{issue.summary}</p>
+        <p className="mt-4 text-sm text-[var(--muted)]">Updated {formattedDate}</p>
+        </div>
 
-        <dl className="mt-10 grid gap-6 border-y border-zinc-200 py-8 sm:grid-cols-2">
+        <div className="px-6 pb-8">
+        <dl className="grid gap-6 border-b border-[var(--rule)] py-8 sm:grid-cols-2">
           <div>
-            <dt className="text-sm font-medium text-zinc-950">
+            <dt className="text-sm font-medium text-[var(--ink)]">
               Affected versions
             </dt>
-            <dd className="mt-2 text-sm leading-6 text-zinc-600">
+            <dd className="mt-2 text-sm leading-6 text-[var(--muted)]">
               {issue.affected_versions}
             </dd>
           </div>
           <div>
-            <dt className="text-sm font-medium text-zinc-950">
+            <dt className="text-sm font-medium text-[var(--ink)]">
               Affected platforms
             </dt>
-            <dd className="mt-2 text-sm leading-6 text-zinc-600">
+            <dd className="mt-2 text-sm leading-6 text-[var(--muted)]">
               {issue.affected_platforms}
             </dd>
           </div>
         </dl>
 
         <section className="mt-8">
-          <h2 className="text-lg font-semibold text-zinc-950">Workaround</h2>
-          <p className="mt-3 text-sm leading-6 text-zinc-600">
+          <h2 className="text-lg font-semibold text-[var(--ink)]">Workaround</h2>
+          <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
             {issue.workaround ?? "No workaround has been published yet."}
           </p>
         </section>
 
         <section className="mt-8">
-          <h2 className="text-lg font-semibold text-zinc-950">
+          <h2 className="text-lg font-semibold text-[var(--ink)]">
             Resolution notes
           </h2>
-          <p className="mt-3 text-sm leading-6 text-zinc-600">
+          <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
             {issue.resolution_notes ??
               "Resolution notes have not been published yet."}
           </p>
         </section>
+        </div>
       </article>
     </main>
   );

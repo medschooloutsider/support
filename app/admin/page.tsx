@@ -11,18 +11,24 @@ export default async function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 px-6 py-16 text-zinc-950">
-      <section className="mx-auto w-full max-w-3xl">
-        <p className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+    <main className="support-shell">
+      <section className="support-panel">
+        <div className="support-panel-header">
+        <p className="kicker">
           {owner.email}
         </p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight">
+        <h1 className="hero-title">
           Support admin
         </h1>
-        <div className="mt-8">
+        <p className="subtitle">
+          Review private reports, manage the queue, and publish summarized issue
+          status.
+        </p>
+        </div>
+        <div className="border-t border-[var(--rule)] p-4">
           <Link
             href="/admin/reports"
-            className="inline-flex rounded-md bg-zinc-950 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800"
+            className="button-primary"
           >
             View report queue
           </Link>

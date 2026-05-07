@@ -2,24 +2,55 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-6 py-16 text-zinc-950">
-      <section className="w-full max-w-2xl">
-        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-          Med School Outsider Support
-        </h1>
-        <p className="mt-5 max-w-xl text-lg leading-8 text-zinc-600">
-          Reviewed technical support status for GPT-MD, PDF-MD, and Alarmist.
-        </p>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+    <main className="support-shell">
+      <section className="support-panel">
+        <div className="support-panel-header">
+          <p className="kicker">Private intake / public status</p>
+          <h1 className="hero-title">Support without leaking diagnostics.</h1>
+          <p className="subtitle">
+            Reviewed technical support status for GPT-MD, PDF-MD, and Alarmist,
+            with raw reports held for owner review.
+          </p>
+        </div>
+        <div className="card-grid">
+          <section className="support-card support-card-soft">
+            <h2 className="text-lg font-semibold text-[var(--ink)]">
+              Public issues
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
+              Read reviewed, grouped issue status without exposing private
+              report packets.
+            </p>
+          </section>
+          <section className="support-card">
+            <h2 className="text-lg font-semibold text-[var(--ink)]">
+              Private reports
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
+              Submit app details, reproduction notes, and diagnostics for owner
+              triage.
+            </p>
+          </section>
+          <section className="support-card">
+            <h2 className="text-lg font-semibold text-[var(--ink)]">
+              Owner review
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
+              Triage, close, request info, or publish summarized public issue
+              updates.
+            </p>
+          </section>
+        </div>
+        <div className="flex flex-col gap-3 border-t border-[var(--rule)] p-4 sm:flex-row">
           <Link
             href="/issues"
-            className="inline-flex h-11 items-center justify-center rounded-md bg-zinc-950 px-5 text-sm font-medium text-white transition-colors hover:bg-zinc-800"
+            className="button-primary"
           >
             View Issues
           </Link>
           <Link
             href="/report"
-            className="inline-flex h-11 items-center justify-center rounded-md border border-zinc-300 px-5 text-sm font-medium text-zinc-950 transition-colors hover:bg-white"
+            className="button-secondary"
           >
             Report Issue
           </Link>
