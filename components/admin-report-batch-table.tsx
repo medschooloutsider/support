@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   bulkSetReportStatusAction,
   prepareCodexTriageAction,
-  type CodexTriageState,
 } from "@/app/admin/reports/actions";
 
 type ReportQueueRow = {
@@ -41,10 +40,6 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-const initialCodexState: CodexTriageState = {
-  message: "",
-};
-
 export function AdminReportBatchTable({
   reports,
   returnPath,
@@ -53,11 +48,6 @@ export function AdminReportBatchTable({
   returnPath: string;
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [copyMessage, setCopyMessage] = useState("");
-  const [codexState, codexAction, isPreparingCodex] = useActionState(
-    prepareCodexTriageAction,
-    initialCodexState,
-  );
   const allSelected = reports.length > 0 && selected.size === reports.length;
   const selectedCount = selected.size;
   const selectedReports = useMemo(
@@ -92,15 +82,6 @@ export function AdminReportBatchTable({
     });
   }
 
-  async function copyCodexBundle() {
-    if (!codexState.bundle) {
-      return;
-    }
-
-    await navigator.clipboard.writeText(codexState.bundle);
-    setCopyMessage("Copied Codex triage bundle.");
-  }
-
   const selectedIds = Array.from(selected);
 
   return (
@@ -115,16 +96,20 @@ export function AdminReportBatchTable({
           </p>
         </div>
         <div className="flex flex-col gap-2 xl:flex-row">
-          <form action={codexAction} className="flex flex-col gap-2 sm:flex-row">
+          <form
+            action={prepareCodexTriageAction}
+            className="flex flex-col gap-2 sm:flex-row"
+          >
+            <input type="hidden" name="returnPath" value={returnPath} />
             {selectedIds.map((reportId) => (
               <input key={reportId} type="hidden" name="reportId" value={reportId} />
             ))}
             <button
               type="submit"
-              disabled={selectedCount === 0 || isPreparingCodex}
+              disabled={selectedCount === 0}
               className="button-secondary disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isPreparingCodex ? "Preparing Codex triage" : "Prepare Codex triage"}
+              Prepare Codex triage
             </button>
           </form>
           <form
@@ -155,44 +140,23 @@ export function AdminReportBatchTable({
         </div>
       </div>
 
-      {codexState.message ? (
-        <section className="rounded-lg border border-[var(--rule)] bg-white p-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-            <div>
-              <p className="font-mono text-xs font-semibold uppercase tracking-wide text-[var(--green)]">
-                Codex triage draft
-              </p>
-              <p className="mt-1 text-sm text-[var(--muted)]">
-                {codexState.message}
-              </p>
-              <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
-                Draft-only: Codex may suggest categories, clusters, summaries,
-                and public issue text. Owner approval is still required for
-                status changes, closures, and publication.
-              </p>
-            </div>
-            {codexState.bundle ? (
-              <button
-                type="button"
-                onClick={copyCodexBundle}
-                className="button-secondary"
-              >
-                Copy bundle
-              </button>
-            ) : null}
+      <section className="rounded-lg border border-[var(--rule)] bg-white p-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="font-mono text-xs font-semibold uppercase tracking-wide text-[var(--green)]">
+              Codex triage drafts
+            </p>
+            <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
+              Draft-only automation lives in a separate review queue. Codex can
+              prepare suggestions and public issue drafts; owner approval is
+              still required before any status, closure, or publication change.
+            </p>
           </div>
-          {codexState.bundle ? (
-            <textarea
-              readOnly
-              value={codexState.bundle}
-              className="mt-4 h-72 w-full rounded-md border border-[var(--rule)] bg-[var(--steel)] p-3 font-mono text-xs leading-5 text-[var(--ink)]"
-            />
-          ) : null}
-          {copyMessage ? (
-            <p className="mt-2 text-sm text-[var(--green)]">{copyMessage}</p>
-          ) : null}
-        </section>
-      ) : null}
+          <Link href="/admin/codex-triage" className="button-secondary">
+            Review drafts
+          </Link>
+        </div>
+      </section>
 
       <div className="overflow-hidden rounded-lg border border-[var(--rule)] bg-white">
         <div className="overflow-x-auto">

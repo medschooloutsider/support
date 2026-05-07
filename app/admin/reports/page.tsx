@@ -170,6 +170,12 @@ export default async function AdminReportsPage({
       ? `Updated ${updated ?? 0} report${updated === "1" ? "" : "s"}${
           skipped && skipped !== "0" ? `; skipped ${skipped}` : ""
         }.`
+      : error === "codex_no_selection"
+        ? "Select at least one report before preparing Codex triage."
+        : error === "codex_too_many"
+          ? "Select 25 or fewer reports for one Codex triage draft."
+          : error?.startsWith("codex_")
+            ? "Codex triage draft could not be prepared."
       : error
         ? "Batch action could not be completed for the selected reports."
         : null;
@@ -178,12 +184,26 @@ export default async function AdminReportsPage({
     <main className="support-shell-wide">
       <section className="support-panel">
         <div className="support-panel-header">
-          <Link
-            href="/admin"
-            className="text-sm font-medium text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
-          >
-            Back to admin
-          </Link>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/admin"
+              className="text-sm font-medium text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+            >
+              Admin home
+            </Link>
+            <Link
+              href="/admin/account"
+              className="text-sm font-medium text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+            >
+              Account settings
+            </Link>
+            <Link
+              href="/admin/codex-triage"
+              className="text-sm font-medium text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+            >
+              Codex drafts
+            </Link>
+          </div>
           <p className="kicker mt-8">Owner queue</p>
           <h1 className="hero-title">Report command center.</h1>
           <p className="subtitle">

@@ -33,10 +33,16 @@ export default async function AdminPage() {
             View report queue
           </Link>
           <Link
+            href="/admin/codex-triage"
+            className="button-secondary"
+          >
+            Codex triage drafts
+          </Link>
+          <Link
             href="/admin/account"
             className="button-secondary"
           >
-            Change password
+            Account settings
           </Link>
         </div>
       </section>

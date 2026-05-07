@@ -5,6 +5,15 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireOwner } from "@/lib/auth";
+import {
+  buildCodexTriageBundle,
+  buildCodexTriageInputPayload,
+  buildCodexTriageTitle,
+  codexTriagePolicy,
+  codexTriagePrompt,
+  codexTriageRequestedOutput,
+  type CodexTriageReportRow,
+} from "@/lib/codex-triage";
 import { canTransitionReport } from "@/lib/moderation";
 import { reportReviewStatusSchema, type ReportStatus } from "@/lib/schema";
 
@@ -12,35 +21,6 @@ type BatchReportRow = {
   id: string;
   status: ReportStatus;
   public_issue_id: string | null;
-};
-
-type CodexTriageReportRow = {
-  id: string;
-  app_id: string;
-  app_name: string | null;
-  app_version: string;
-  app_build: string | null;
-  status: ReportStatus;
-  category: string | null;
-  source: string;
-  summary: string;
-  reporter_email: string;
-  platform: string;
-  os_version: string;
-  description: string;
-  reproduction_steps: string;
-  expected_result: string;
-  actual_result: string;
-  workflow_context: unknown | null;
-  diagnostics: unknown | null;
-  created_at: string;
-  updated_at: string;
-};
-
-export type CodexTriageState = {
-  message: string;
-  draftId?: string;
-  bundle?: string;
 };
 
 function createServiceClient() {
@@ -74,46 +54,22 @@ function readReportIds(formData: FormData) {
     .filter((value): value is string => typeof value === "string" && value.length > 0);
 }
 
-function truncateString(value: string, maxLength: number) {
-  if (value.length <= maxLength) {
-    return value;
-  }
-
-  return `${value.slice(0, maxLength)}\n[truncated ${value.length - maxLength} chars]`;
-}
-
-function sanitizeForBundle(report: CodexTriageReportRow) {
-  return {
-    ...report,
-    reporter_email: report.reporter_email.replace(/^(.).+(@.*)$/, "$1***$2"),
-    description: truncateString(report.description, 4000),
-    reproduction_steps: truncateString(report.reproduction_steps, 4000),
-    expected_result: truncateString(report.expected_result, 1500),
-    actual_result: truncateString(report.actual_result, 1500),
-    diagnostics_json: report.diagnostics
-      ? truncateString(JSON.stringify(report.diagnostics), 20000)
-      : null,
-  };
-}
-
-export async function prepareCodexTriageAction(
-  _previousState: CodexTriageState,
-  formData: FormData,
-): Promise<CodexTriageState> {
+export async function prepareCodexTriageAction(formData: FormData) {
   const owner = await requireOwner();
 
   if (!owner.allowed) {
-    return { message: "Owner session is required." };
+    redirect("/");
   }
 
+  const returnPath = readReturnPath(formData);
   const reportIds = readReportIds(formData);
 
   if (!reportIds.length) {
-    return { message: "Select at least one report before preparing Codex triage." };
+    redirect(`${returnPath}?error=codex_no_selection`);
   }
 
   if (reportIds.length > 25) {
-    return { message: "Select 25 or fewer reports for one Codex triage bundle." };
+    redirect(`${returnPath}?error=codex_too_many`);
   }
 
   const supabase = createServiceClient();
@@ -126,87 +82,74 @@ export async function prepareCodexTriageAction(
     .returns<CodexTriageReportRow[]>();
 
   if (error || !reports?.length) {
-    return { message: "Could not load selected reports for Codex triage." };
+    redirect(`${returnPath}?error=codex_load_failed`);
   }
 
-  const payload = {
-    policy: {
-      ownerTriggered: true,
-      draftOnly: true,
-      codexMay: [
-        "create triage suggestions",
-        "propose clusters",
-        "summarize private evidence for owner review",
-        "draft sanitized public issue text",
-      ],
-      codexMustNot: [
-        "close reports",
-        "publish public issues",
-        "change customer-visible state",
-        "change report status without owner approval",
-      ],
-    },
-    requestedOutput: {
-      perReport: [
-        "suggested_category",
-        "suggested_severity",
-        "suggested_priority",
-        "private_owner_summary",
-        "confidence",
-      ],
-      crossReport: [
-        "duplicate_or_related_clusters",
-        "cluster_rationale",
-        "recommended_owner_next_actions",
-      ],
-      publicDrafts: [
-        "sanitized_title",
-        "sanitized_summary",
-        "affected_apps_versions_platforms",
-        "workaround_if_any",
-      ],
-    },
-    reports: reports.map(sanitizeForBundle),
-  };
-  const actorUserId = await getActorUserId(supabase);
+  const payload = buildCodexTriageInputPayload(reports);
+  const actorUserId = owner.userId ?? (await getActorUserId(supabase));
+  const title = buildCodexTriageTitle(reports);
   const { data: draft, error: insertError } = await supabase
-    .from("moderation_events")
+    .from("codex_triage_drafts")
     .insert({
-      report_id: null,
-      public_issue_id: null,
       actor_user_id: actorUserId,
-      action: "codex_triage_draft_prepared",
-      metadata: {
-        draftOnly: true,
-        reportIds: reports.map((report) => report.id),
-        payload,
-      },
+      status: "prepared",
+      title,
+      prompt: codexTriagePrompt,
+      policy: codexTriagePolicy,
+      requested_output: codexTriageRequestedOutput,
+      input_payload: payload,
+      report_ids: reports.map((report) => report.id),
     })
     .select("id")
     .single<{ id: string }>();
 
   if (insertError || !draft) {
-    return { message: "Could not save the Codex triage draft audit event." };
+    const { data: fallbackDraft, error: fallbackError } = await supabase
+      .from("moderation_events")
+      .insert({
+        report_id: null,
+        public_issue_id: null,
+        actor_user_id: actorUserId,
+        action: "codex_triage_draft_prepared",
+        metadata: {
+          fallbackStore: "moderation_events",
+          draftOnly: true,
+          title,
+          prompt: codexTriagePrompt,
+          policy: codexTriagePolicy,
+          requestedOutput: codexTriageRequestedOutput,
+          reportIds: reports.map((report) => report.id),
+          payload,
+        },
+      })
+      .select("id")
+      .single<{ id: string }>();
+
+    if (fallbackError || !fallbackDraft) {
+      redirect(`${returnPath}?error=codex_save_failed`);
+    }
+
+    revalidatePath("/admin/codex-triage");
+    revalidatePath("/admin/reports");
+    redirect(`/admin/codex-triage/${fallbackDraft.id}?message=prepared`);
   }
 
-  const bundle = JSON.stringify(
-    {
-      prompt:
-        "Review this owner-triggered support triage bundle. Produce draft-only suggestions, clusters, summaries, and sanitized public issue drafts. Do not change statuses, close reports, publish issues, or change customer-visible state.",
+  await supabase.from("moderation_events").insert({
+    report_id: null,
+    public_issue_id: null,
+    actor_user_id: actorUserId,
+    action: "codex_triage_draft_prepared",
+    metadata: {
+      draftOnly: true,
       draftId: draft.id,
-      ...payload,
+      reportIds: reports.map((report) => report.id),
+      bundle: buildCodexTriageBundle({ draftId: draft.id, payload }),
     },
-    null,
-    2,
-  );
+  });
 
-  return {
-    message: `Prepared Codex triage draft ${draft.id} for ${reports.length} report${
-      reports.length === 1 ? "" : "s"
-    }.`,
-    draftId: draft.id,
-    bundle,
-  };
+  revalidatePath("/admin/codex-triage");
+  revalidatePath("/admin/reports");
+  redirect(`/admin/codex-triage/${draft.id}?message=prepared`);
 }
 
 export async function bulkSetReportStatusAction(formData: FormData) {
@@ -263,7 +206,7 @@ export async function bulkSetReportStatusAction(formData: FormData) {
     redirect(`${returnPath}?error=bulk_update_failed`);
   }
 
-  const actorUserId = await getActorUserId(supabase);
+  const actorUserId = owner.userId ?? (await getActorUserId(supabase));
   await supabase.from("moderation_events").insert(
     validReports.map((report) => ({
       report_id: report.id,

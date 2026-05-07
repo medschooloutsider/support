@@ -13,6 +13,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <main className="support-shell">
+      {message ? (
+        <div
+          role="status"
+          className="fixed right-4 top-4 z-50 max-w-sm rounded-lg border border-[var(--rule)] bg-white px-4 py-3 text-sm font-semibold text-[var(--green)] shadow-[var(--shadow)]"
+        >
+          {message}
+        </div>
+      ) : null}
       <section className="support-panel mx-auto max-w-2xl">
         <div className="support-panel-header">
         <p className="kicker">
@@ -27,7 +35,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         </div>
         <div className="p-4">
         {message ? (
-          <p className="mb-4 rounded-md border border-[var(--rule)] bg-[var(--green-soft)] px-3 py-2 text-sm text-[var(--green)]">
+          <p className="mb-4 rounded-md border border-[var(--rule)] bg-[var(--green-soft)] px-3 py-2 text-sm font-medium text-[var(--green)]">
             {message}
           </p>
         ) : null}
