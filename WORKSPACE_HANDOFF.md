@@ -1,6 +1,6 @@
 # Workspace Handoff
 
-Updated: 2026-05-01 17:23 CEST
+Updated: 2026-05-07 02:56 CEST
 
 ## Lane
 
@@ -11,7 +11,7 @@ Updated: 2026-05-01 17:23 CEST
 
 ## Current Objective
 
-First implementation slice is complete, verified locally, pushed to GitHub, deployed to Vercel with real Supabase runtime values, and available on a free branded Vercel alias. The next objective is app-side Report Issue integration.
+Support reporting, owner login, batch queue management, owner password changes, and owner-triggered draft Codex triage are live on the free branded Vercel alias. The current follow-up is applying the optional dedicated `codex_triage_drafts` Supabase migration once a Supabase personal access token is available; production is safe before that because the Codex triage workflow falls back to append-only `moderation_events`.
 
 ## What Is Already Done
 
@@ -38,6 +38,10 @@ First implementation slice is complete, verified locally, pushed to GitHub, depl
   - Live Vercel `POST /api/app-reports` accepted valid GPT-MD smoke report `5596d14e-584b-4cce-bfa6-316698546aa5` with HTTP 201 and status `unverified`.
   - Live Vercel `POST /api/app-reports` accepted valid PDF-MD smoke report `1f0ef8c4-7b30-47ac-8b24-c1f4d78280c3` with HTTP 201 and status `unverified`.
   - `/issues` returned HTTP 200; `/admin/reports` remained owner auth-gated with HTTP 307.
+- Owner admin access was recovered through password login, and owner password changes are now handled at `/admin/account` with current-password verification and global sign-out after success.
+- `/admin/reports` now supports batch status management plus owner-triggered Codex triage preparation. Codex triage is draft-only: it can prepare suggestions, clusters, summaries, and public issue drafts, but it does not close reports, publish public issues, change report status, or change customer-visible state.
+- `/admin/codex-triage` now lists and reviews prepared Codex triage bundles. Migration `supabase/migrations/0003_codex_triage_drafts.sql` defines the preferred `codex_triage_drafts` table, while production currently remains usable through the `moderation_events` fallback because `npx supabase db push --include-all` is blocked by missing `SUPABASE_ACCESS_TOKEN`.
+- Latest support production deployment is `dpl_22Hk7J6Brkm8DrZG9EpfsSg6qzwu`, aliased to `https://medschooloutsider-support.vercel.app`. Live smoke passed for login, password-change notification, account links, Codex draft preparation/detail review, unchanged report row state, and no horizontal overflow.
 - Stale reporting worktrees were retired on 2026-05-01 after current app/support `main` branches were confirmed to carry the required fixes:
   - Retired worktrees: `GPT-MD-support-reporting`, `GPT-MD-support-reporting-clean`, `PDF-MD-support-reporting`, `PDF-MD-support-reporting-clean`, and `support-diagnostics-api`.
   - Recovery archive: `/Volumes/DATA_ARCHIVE/Hub_Network/20_App_And_Tool_Hubs/AppDev_Hub/archives/support-reporting-worktree-retirement-20260501_172023`.
@@ -62,6 +66,7 @@ First implementation slice is complete, verified locally, pushed to GitHub, depl
 
 ## Left To Do
 
+- Apply `supabase/migrations/0003_codex_triage_drafts.sql` to production once a Supabase personal access token is available. Until then, Codex triage draft preparation uses the `moderation_events` fallback.
 - Replace placeholder Lemon Squeezy env vars if future code starts using private Lemon API credentials; current license validation route does not use the private Lemon API key.
 - Set `APPLE_RECEIPT_SHARED_SECRET` in Vercel if Apple receipt validation is enabled for the support adapter.
 - Add a GitHub login connection in Vercel, then link `medschooloutsider/support` to the Vercel project.
