@@ -56,9 +56,20 @@ export async function changeOwnerPassword(
   }
 
   const supabase = await createClient();
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: owner.email,
+    password: currentPassword,
+  });
+
+  if (signInError) {
+    return {
+      status: "error",
+      message: "Check the current password.",
+    };
+  }
+
   const { error: updateError } = await supabase.auth.updateUser({
     password: nextPassword,
-    current_password: currentPassword,
   });
 
   if (updateError) {
