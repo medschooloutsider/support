@@ -47,7 +47,7 @@ export function ReportForm() {
             required
             maxLength={80}
             className={inputClassName}
-            placeholder="1.0.0"
+            placeholder="PDF-MD 1.0.1"
           />
         </label>
 
@@ -91,8 +91,20 @@ export function ReportForm() {
             name="licenseKey"
             autoComplete="off"
             className={inputClassName}
-            placeholder="Optional for Alarmist"
+            placeholder="Optional, used only for purchase verification"
           />
+        </label>
+
+        <label className={labelClassName}>
+          Request type
+          <select name="category" className={inputClassName} defaultValue="other">
+            <option value="other">Question or general support</option>
+            <option value="bug">Bug report</option>
+            <option value="bad_output">PDF-MD output or OCR problem</option>
+            <option value="missing_feature">Feature request</option>
+            <option value="purchase_access">Purchase or App Store access</option>
+            <option value="safety">Safety or privacy concern</option>
+          </select>
         </label>
       </div>
 
@@ -116,6 +128,7 @@ export function ReportForm() {
           minLength={20}
           maxLength={5000}
           className={textareaClassName}
+          placeholder="For PDF-MD, describe the file type, selected route, output problem, or support question."
         />
       </label>
 
@@ -127,6 +140,7 @@ export function ReportForm() {
           minLength={8}
           maxLength={5000}
           className={textareaClassName}
+          placeholder="Example: Open PDF-MD, add the PDF, choose Hybrid, preview pages 1-3, export Markdown."
         />
       </label>
 

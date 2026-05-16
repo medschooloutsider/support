@@ -1,6 +1,6 @@
 # Workspace Handoff
 
-Updated: 2026-05-07 03:03 CEST
+Updated: 2026-05-16 13:04 CEST
 
 ## Lane
 
@@ -43,6 +43,7 @@ Support reporting, owner login, batch queue management, owner password changes, 
 - `/admin/codex-triage` now lists and reviews prepared Codex triage bundles. Migration `supabase/migrations/0003_codex_triage_drafts.sql` has been applied to production, so new drafts use the dedicated `codex_triage_drafts` table; the `moderation_events` fallback remains for older fallback drafts and defensive compatibility.
 - Latest support production deployment is `dpl_22Hk7J6Brkm8DrZG9EpfsSg6qzwu`, aliased to `https://medschooloutsider-support.vercel.app`. Live smoke passed for login, password-change notification, account links, Codex draft preparation/detail review, unchanged report row state, and no horizontal overflow.
 - Production migration proof passed on 2026-05-07 03:03 CEST: live draft `/admin/codex-triage/6c9e398e-2ded-4587-827d-c0454201c079?message=prepared` reported `Store: codex_triage_drafts`, appeared in the draft list, and did not mutate the selected report row.
+- PDF-MD App Review support URL refresh is complete and deployed for Guideline 1.5. The public homepage now explicitly supports asking questions, requesting support, reporting PDF-MD issues, reading response expectations, understanding privacy handling, and choosing between private support requests and public issue discussion. The report page now includes PDF-MD-specific help examples, response timing, and privacy guidance. The web report form now offers request types and stores public web requests through the server-side report path without requiring owner login. Production deployment `dpl_HqozjFFSaZLyeV7wfACdyVJKdaAH` is aliased to `https://medschooloutsider-support.vercel.app`.
 - Stale reporting worktrees were retired on 2026-05-01 after current app/support `main` branches were confirmed to carry the required fixes:
   - Retired worktrees: `GPT-MD-support-reporting`, `GPT-MD-support-reporting-clean`, `PDF-MD-support-reporting`, `PDF-MD-support-reporting-clean`, and `support-diagnostics-api`.
   - Recovery archive: `/Volumes/DATA_ARCHIVE/Hub_Network/20_App_And_Tool_Hubs/AppDev_Hub/archives/support-reporting-worktree-retirement-20260501_172023`.
@@ -72,6 +73,7 @@ Support reporting, owner login, batch queue management, owner password changes, 
 - Add a GitHub login connection in Vercel, then link `medschooloutsider/support` to the Vercel project.
 - Configure app-side support HMAC secrets outside source control before enabling direct submission in shipped builds.
 - Optional deeper visible UI smoke can manually click through the Report Issue modal in each app; direct upload remains gated by out-of-source HMAC configuration.
+- No support-site deploy remains for the 2026-05-16 PDF-MD App Review support URL refresh.
 - Optional branch deletion remains separate and requires explicit approval; the retired reporting branch refs were intentionally preserved for recovery.
 
 ## Production Proof 2026-05-01
@@ -83,3 +85,11 @@ Support reporting, owner login, batch queue management, owner password changes, 
 - Vercel was redeployed from this repo as `dpl_HJpJdaRAbuHAdPrgDaH38ZDeKgmz` and `https://medschooloutsider-support.vercel.app` was re-aliased to that fresh deployment.
 - Owner admin proof passed against the canonical URL: report queue and report detail returned HTTP 200, showed the Alarmist report, reporter email, version/platform, workflow context, private diagnostics including `recentLog`, and review controls for owner triage.
 - Evidence: `QA/support-report-visible-smoke/20260501_live_admin_canonical_fixed/summary.json`, `admin-report-queue.png`, and `admin-report-detail.png`.
+
+## Local Proof 2026-05-16
+
+- AppDev gates passed from the support repo with `--surface-kind app`: coordination readiness, master-plan, and scope check for `PDF-MD App Review support URL only update for Guideline 1.5`.
+- Verification passed: `npm run lint`, `npm run test` with 44 tests, `npm run build`, and `git diff --check`.
+- Local dev HTTP fetches confirmed `/`, `/report`, and `/issues` return and include the new PDF-MD support, response-time, privacy, request-type, and public issue routing text.
+- Production deployment `dpl_HqozjFFSaZLyeV7wfACdyVJKdaAH` was aliased to `https://medschooloutsider-support.vercel.app`, and live fetches confirmed the same homepage, report-page, and issues-page text.
+- Browser e2e remains blocked locally because Playwright's Chromium binary is missing and the browser install path attempted to use `sudo`.

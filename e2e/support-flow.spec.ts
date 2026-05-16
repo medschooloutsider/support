@@ -8,7 +8,7 @@ test("public support pages render", async ({ page }) => {
   ).toBeVisible();
 
   const issuesLink = page
-    .getByRole("link", { name: "View Issues" })
+    .getByRole("link", { name: "View Public Issues" })
     .or(page.getByRole("link", { name: "Browse issues" }));
 
   await issuesLink.click();

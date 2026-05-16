@@ -1,6 +1,6 @@
 # Support Hub Master Plan
 
-Updated: 2026-04-29
+Updated: 2026-05-16
 
 ## End Goal
 
@@ -17,7 +17,7 @@ Build a public support hub for Med School Outsider apps where users can read rev
 - Product behavior remains in the owning app repos.
 - Raw reports stay private unless the owner manually publishes summarized content.
 - Public issue status vocabulary is `known`, `being_resolved`, and `to_be_resolved`.
-- Website reports require verified email and purchase verification where available.
+- Website reports require a reporter email and purchase verification where available; unverified submissions stay in the owner-review queue.
 - App-originated reports with valid support API signatures are treated as app-trusted; unsigned or invalidly signed app payloads are accepted into the unverified owner-review queue.
 
 ## Execution Model

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { createClient as createSupabaseAdminClient } from "@supabase/supabase-js";
 
 import {
   decideEntitlement,
@@ -8,14 +9,9 @@ import {
 } from "@/lib/entitlement";
 import { buildReportInsert } from "@/lib/reports";
 import { reportInputSchema } from "@/lib/schema";
-import { createClient } from "@/lib/supabase/server";
 
 export type ReportFormState = {
   message: string;
-};
-
-const signedOutState: ReportFormState = {
-  message: "Sign in with a verified email before submitting a report.",
 };
 
 const invalidState: ReportFormState = {
@@ -39,20 +35,13 @@ export async function submitWebReport(
   _previousState: ReportFormState,
   formData: FormData,
 ): Promise<ReportFormState> {
-  const supabase = await createClient();
-  const { data: claimsData } = await supabase.auth.getClaims();
-  const userId = claimsData?.claims?.sub;
-
-  if (!userId) {
-    return signedOutState;
-  }
-
   const inputResult = reportInputSchema.safeParse({
     appId: readFormString(formData, "appId"),
     appVersion: readFormString(formData, "appVersion"),
     platform: readFormString(formData, "platform"),
     osVersion: readFormString(formData, "osVersion"),
     reporterEmail: readFormString(formData, "reporterEmail"),
+    category: readFormString(formData, "category") || undefined,
     summary: readFormString(formData, "summary"),
     description: readFormString(formData, "description"),
     reproductionSteps: readFormString(formData, "reproductionSteps"),
@@ -82,7 +71,18 @@ export async function submitWebReport(
     input: inputResult.data,
     entitlementKind: entitlement.kind,
     queue: entitlement.queue,
-    reporterUserId: userId,
+    reporterUserId: null,
+  });
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseSecretKey = process.env.SUPABASE_SECRET_KEY;
+
+  if (!supabaseUrl || !supabaseSecretKey) {
+    return saveErrorState;
+  }
+
+  const supabase = createSupabaseAdminClient(supabaseUrl, supabaseSecretKey, {
+    auth: { persistSession: false },
   });
 
   const { error } = await supabase.from("reports").insert(insert);
