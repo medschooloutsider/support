@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Med School Outsider Support",
+  title: "PDF-MD Support",
   description:
-    "Public support hub for reviewed technical support status across GPT-MD, PDF-MD, and Alarmist.",
+    "Support page for PDF-MD questions, support requests, bug reports, licensing help, and App Store access.",
 };
 
 export default function RootLayout({

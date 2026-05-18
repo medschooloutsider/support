@@ -1,10 +1,9 @@
 import Link from "next/link";
 
 const navItems = [
-  { href: "/", label: "Overview" },
+  { href: "/", label: "Support" },
   { href: "/issues", label: "Issues" },
   { href: "/report", label: "Report" },
-  { href: "/admin/reports", label: "Admin" },
 ];
 
 export function SupportShell({ children }: { children: React.ReactNode }) {
@@ -16,7 +15,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
       <header className="site-header">
         <Link className="brand" href="/">
           <span className="brand-mark">MSO</span>
-          <span>Med School Outsider Support</span>
+          <span>PDF-MD Support</span>
         </Link>
         <nav className="site-tabs" aria-label="Primary">
           {navItems.map((item) => (
@@ -28,7 +27,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
       </header>
       <div id="main-content">{children}</div>
       <footer className="site-footer">
-        <span>Support hub for GPT-MD, PDF-MD, and Alarmist.</span>
+        <span>PDF-MD support: questions, support requests, and issue reports.</span>
         <span>Private diagnostics stay private until reviewed.</span>
       </footer>
     </>

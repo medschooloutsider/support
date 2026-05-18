@@ -5,19 +5,44 @@ export default function Home() {
     <main className="support-shell">
       <section className="support-panel">
         <div className="support-panel-header">
-          <p className="kicker">PDF-MD support / app questions</p>
-          <h1 className="hero-title">Med School Outsider Support</h1>
+          <p className="kicker">Official app support</p>
+          <h1 className="hero-title">PDF-MD Support</h1>
           <p className="subtitle">
-            Ask questions, request support, or report issues for PDF-MD,
-            GPT-MD, and Alarmist. PDF-MD users can get help with PDF import,
-            OCR mode choice, Markdown export, audits, licensing, and App Store
-            access.
+            Ask questions, request support, or report a PDF-MD problem here.
+            Support covers PDF import, OCR mode choice, Markdown export, audit
+            sidecars, licensing, and App Store access.
           </p>
+        </div>
+        <div className="border-t border-[var(--rule)] p-4">
+          <section className="support-card support-card-soft">
+            <h2 className="text-lg font-semibold text-[var(--ink)]">
+              Contact PDF-MD support
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
+              Use the support request form or email{" "}
+              <a href="mailto:worldpresident1030@gmail.com">
+                worldpresident1030@gmail.com
+              </a>
+              . Include the PDF-MD version, your macOS version, what you were
+              trying to do, and what went wrong.
+            </p>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+              <Link href="/report" className="button-primary">
+                Ask a Question or Request Support
+              </Link>
+              <a
+                href="mailto:worldpresident1030@gmail.com?subject=PDF-MD%20support"
+                className="button-secondary"
+              >
+                Email Support
+              </a>
+            </div>
+          </section>
         </div>
         <div className="card-grid">
           <section className="support-card support-card-soft">
             <h2 className="text-lg font-semibold text-[var(--ink)]">
-              Contact path
+              Support request form
             </h2>
             <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
               Use the support request form for questions, bug reports, purchase

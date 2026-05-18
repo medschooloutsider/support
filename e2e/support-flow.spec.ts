@@ -4,8 +4,9 @@ test("public support pages render", async ({ page }) => {
   await page.goto("/");
 
   await expect(
-    page.getByRole("heading", { name: "Med School Outsider Support" }),
+    page.getByRole("heading", { name: "PDF-MD Support" }),
   ).toBeVisible();
+  await expect(page.getByRole("link", { name: "Email Support" })).toBeVisible();
 
   const issuesLink = page
     .getByRole("link", { name: "View Public Issues" })
